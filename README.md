@@ -1,5 +1,8 @@
 # terraform_study
 
+> このリポジトリは Claude Code を使って作成しました。
+> 内容の正確性には注意を払っていますが、必ず公式ドキュメントと合わせて確認してください。
+
 Terraform による IaC（Infrastructure as Code）を段階的に学ぶリポジトリ。
 
 ## 学習フロー
