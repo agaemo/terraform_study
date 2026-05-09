@@ -162,6 +162,118 @@ Pod・Deployment・Service などの Kubernetes リソース管理を同一ツ�
 Web サーバー・DB・ロードバランサーなど多層構成のリソースを一括定義できる。
 リソースグラフにより依存関係を自動解決しながら並列デプロイされる。
 
+## `.tf` ファイルの基本
+
+### Terraform はファイルをどう読むか
+
+Terraform は **同じディレクトリにある `.tf` ファイルをすべて読み込む**。  
+ファイルを複数に分けても、1ファイルにまとめても、動作は同じ。  
+サブディレクトリは自動では読まない（モジュールとして明示的に呼ぶ必要がある）。
+
+### 一般的なファイル構成
+
+```
+project/
+├── main.tf           # メインのリソース定義（resource ブロックなど）
+├── variables.tf      # 入力変数の定義（variable ブロック）
+├── outputs.tf        # 出力値の定義（output ブロック）
+├── providers.tf      # プロバイダー設定（provider ブロック）
+├── versions.tf       # terraform ブロック（required_providers, required_version）
+└── terraform.tfvars  # 変数に渡す値（機密情報は .gitignore 対象）
+```
+
+これはあくまで**慣習**であり、Terraform 自体はファイル名を関知しない。
+
+### `main.tf` は変更できるか？
+
+できる。`main.tf` という名前に特別な意味はなく、`.tf` 拡張子であれば何でもよい。
+
+リソースが増えてきたら用途別に分割するのが一般的：
+
+```
+network.tf    # VPC・Subnet・Security Group
+compute.tf    # EC2・ECS・Lambda
+database.tf   # RDS・DynamoDB
+iam.tf        # IAM Role・Policy
+```
+
+1ファイルに全部書いても動くが、可読性・保守性のために分割する。
+
+### `terraform {}` ブロックは1つだけか？
+
+**プロジェクト（ディレクトリ）あたり原則1つ**。  
+複数の `.tf` ファイルにまたがって書くことは技術的には可能だが、設定が分散して混乱しやすいため `versions.tf` または `main.tf` にまとめるのが慣習。
+
+複数のプロバイダーを使う場合も `required_providers` に並べて書く：
+
+```hcl
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+  }
+}
+```
+
+### 各ファイルの役割
+
+**main.tf — 何を作るかを定義する**
+
+`resource` ブロックでリソースを宣言する。  
+`${var.name}` のように `variables.tf` の変数を参照できる。
+
+```hcl
+resource "aws_s3_bucket" "example" {
+  bucket = "${var.project_name}-bucket"
+}
+```
+
+**variables.tf — 外から値を渡すための入口を定義する**
+
+`variable` ブロックで入力変数を定義する。  
+`validation` で許可する値を制約することもできる。
+
+```hcl
+variable "environment" {
+  type    = string
+  default = "dev"
+
+  validation {
+    condition     = contains(["dev", "stg", "prod"], var.environment)
+    error_message = "dev / stg / prod のいずれかを指定してください。"
+  }
+}
+```
+
+値を渡す方法は主に3つ：
+
+| 方法 | 例 |
+|------|----|
+| コマンドラインで直接渡す | `terraform apply -var="environment=stg"` |
+| `.tfvars` ファイルで渡す | `terraform apply -var-file="prod.tfvars"` |
+| 環境変数で渡す | `TF_VAR_environment=stg terraform apply` |
+
+**outputs.tf — apply 後に表示する値を定義する**
+
+`output` ブロックで `terraform apply` 完了後に端末に表示される値を定義する。  
+`terraform output` コマンドでいつでも再表示できる。  
+モジュール間でリソースの情報を受け渡す仕組みとしても使われる（phase3 以降で登場）。
+
+```hcl
+output "bucket_name" {
+  description = "作成された S3 バケット名"
+  value       = aws_s3_bucket.example.bucket
+}
+```
+
+---
+
 ## 次のステップ
 
 → [フェーズ1：基本操作（init / plan / apply）](../README.md#フェーズ1基本操作init--plan--apply)
