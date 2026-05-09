@@ -164,4 +164,4 @@ Web サーバー・DB・ロードバランサーなど多層構成のリソー�
 
 ## 次のステップ
 
-→ [phase1](../phase1/README.md): 実際に Terraform を動かしてみる
+→ [フェーズ1：基本操作（init / plan / apply）](../phase1/README.md)

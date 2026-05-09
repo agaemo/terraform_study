@@ -66,4 +66,4 @@ phase2/
 
 ## 次のステップ
 
-→ [phase3](../phase3/README.md): モジュール化して設定を再利用する
+→ [フェーズ3：モジュール化](../phase3/README.md)

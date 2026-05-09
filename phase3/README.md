@@ -71,4 +71,4 @@ phase3/
 
 ## 次のステップ
 
-→ [best_practices](../best_practices/README.md): 本番環境での設計指針
+→ [ベストプラクティス](../best_practices/README.md)
