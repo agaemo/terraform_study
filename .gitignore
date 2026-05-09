@@ -25,5 +25,8 @@ override.tf.json
 # Terraform plan files
 *.tfplan
 
+# Generated outputs
+outputs/
+
 # OS
 .DS_Store
