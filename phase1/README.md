@@ -16,26 +16,29 @@ AWS も Docker も不要で、Terraform の基本操作（init/plan/apply/destro
 ```bash
 cd phase1/
 
-# 1. プロバイダーをダウンロード
+# 1. Terraform をインストール（mise を使用）
+mise install
+
+# 2. プロバイダーをダウンロード
 terraform init
 
-# 2. 作成されるリソースを確認（実際には何も変更しない）
+# 3. 作成されるリソースを確認（実際には何も変更しない）
 terraform plan
 
-# 3. リソースを作成
+# 4. リソースを作成
 terraform apply
 # → "yes" と入力して確定
 
-# 4. 生成されたファイルを確認
+# 5. 生成されたファイルを確認
 cat outputs/hello.txt
 cat outputs/config.json
 
-# 5. State ファイルを確認（Terraform が追跡している状態）
+# 6. State ファイルを確認（Terraform が追跡している状態）
 cat terraform.tfstate
 
-# 6. main.tf を変更して再度 plan/apply で差分を体験する
+# 7. main.tf を変更して再度 plan/apply で差分を体験する
 
-# 7. 後片付け
+# 8. 後片付け
 terraform destroy
 ```
 
