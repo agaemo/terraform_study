@@ -13,37 +13,65 @@ AWS も Docker も不要で、Terraform の基本操作（init/plan/apply/destro
 
 ## 実行手順
 
+Terraform の **Write → Plan → Apply** ワークフローに沿って進める。
+
+### 準備
+
 ```bash
-# 1. mise に .mise.toml を信頼させる（初回のみ）
-mise trust
-
-# 2. Terraform をインストール
-mise install
-
+mise trust    # mise に .mise.toml を信頼させる（初回のみ）
+mise install  # Terraform をインストール
 cd phase1/
+```
 
-# 3. プロバイダーをダウンロード
-terraform init
+### Write — 設定ファイルを読む
 
-# 4. 作成されるリソースを確認（実際には何も変更しない）
-terraform plan
+このフェーズでは `.tf` ファイルがあらかじめ用意されている。
+各ファイルが何を定義しているかを確認してから次に進む。
 
-# 5. リソースを作成
-terraform apply
-# → "yes" と入力して確定
+| ファイル | 内容 |
+|---------|------|
+| `main.tf` | ローカルファイル2つを作成するリソース定義 |
+| `variables.tf` | 名前・環境・バージョンなどの入力変数 |
+| `outputs.tf` | 作成されたファイルのパスを出力 |
 
-# 6. 生成されたファイルを確認
-cat outputs/hello.txt
+→ 各ファイルの詳細は「[各ファイルの役割](#各ファイルの役割)」を参照
+
+### Plan — 変更内容を確認する
+
+```bash
+terraform init  # プロバイダーをダウンロード（Plan の前準備）
+terraform plan  # 作成されるリソースを確認（実際には何も変更しない）
+```
+
+`+` が表示されているリソースが新規作成される（`-` 削除・`~` 変更・`-/+` 再作成）。
+
+### Apply — リソースを作成する
+
+```bash
+terraform apply       # → "yes" と入力して確定
+
+cat outputs/hello.txt   # 生成されたファイルを確認
 cat outputs/config.json
 
-# 7. State ファイルを確認（Terraform が追跡している状態）
-cat terraform.tfstate
+cat terraform.tfstate   # State ファイルを確認（Terraform が追跡している状態）
+```
 
-# 8. main.tf を変更して再度 plan/apply で差分を体験する
+### Write → Plan → Apply を繰り返す
 
-# 9. 後片付け（local プロバイダーはローカルファイルのみなので省略可）
-# AWS 等のクラウドリソースでは放置するとコストが発生するため必須の習慣
+`main.tf` の `content` を書き換えて、差分がどう表示されるかを体験する。
+
+```bash
+# main.tf を編集後
+terraform plan   # ~ で変更差分が表示される
+terraform apply
+```
+
+### Destroy — 後片付け
+
+```bash
 terraform destroy
+# local プロバイダーはローカルファイルのみなので省略可
+# AWS 等のクラウドリソースでは放置するとコストが発生するため必須の習慣
 ```
 
 ## ファイル構成
