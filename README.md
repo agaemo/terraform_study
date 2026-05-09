@@ -33,6 +33,29 @@ docker compose up -d    # LocalStack を起動（phase2以降で使用）
 
 ---
 
+## LocalStack について
+
+LocalStack は、ローカルマシン上で AWS サービスを模擬（エミュレート）するツール。S3・IAM・EC2・SQS などの AWS API をローカルで動かせるため、実際の AWS アカウントなしに Terraform のコードを試せる。
+
+Terraform や AWS CLI からは「本物の AWS」と同じ API に見えるため、コードの変更は最小限で済む。このリポジトリでは `provider "aws"` の `endpoints` を `http://localhost:4566` に向けることで LocalStack と通信している。
+
+**実務での主な使いどころ**
+
+| 用途 | 内容 |
+|------|------|
+| CI/CD パイプライン | PR ごとの自動テストを AWS コスト・速度の制約なしに実行 |
+| ローカル開発環境の統一 | `docker compose up` だけで全員が同じ環境を持てる |
+| オフライン開発 | インターネット接続なしで AWS を使うコードを開発・テスト可能 |
+
+**限界**
+- 無料版（Community）はサポートするサービスが限られる
+- IAM の細かい挙動など、本番と完全に一致しない場合がある
+- 最終的な本番確認は実際の AWS が必要
+
+実務では「ユニットテスト・ローカル開発は LocalStack、ステージング以降は本物の AWS」という使い分けが一般的。
+
+---
+
 ## 学習フェーズ
 
 ### はじめに：Terraform とは何か
