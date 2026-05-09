@@ -41,7 +41,8 @@ cat terraform.tfstate
 
 # 8. main.tf を変更して再度 plan/apply で差分を体験する
 
-# 9. 後片付け
+# 9. 後片付け（local プロバイダーはローカルファイルのみなので省略可）
+# AWS 等のクラウドリソースでは放置するとコストが発生するため必須の習慣
 terraform destroy
 ```
 
