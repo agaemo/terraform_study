@@ -1,0 +1,6 @@
+# このファイルをコピーして terraform.tfvars を作成し、値を書き換えて使う
+# terraform.tfvars は .gitignore で除外されているので機密情報も書ける
+
+environment       = "dev"
+project_name      = "terraform-study"
+enable_versioning = false
