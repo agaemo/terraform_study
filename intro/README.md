@@ -164,4 +164,4 @@ Web サーバー・DB・ロードバランサーなど多層構成のリソー�
 
 ## 次のステップ
 
-→ [フェーズ1：基本操作（init / plan / apply）](../phase1/README.md)
+→ [フェーズ1：基本操作（init / plan / apply）](../README.md#フェーズ1基本操作init--plan--apply)

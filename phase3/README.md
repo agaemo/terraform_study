@@ -71,4 +71,4 @@ phase3/
 
 ## 次のステップ
 
-→ [ベストプラクティス](../best_practices/README.md)
+→ [ベストプラクティス](../README.md#ベストプラクティス)
