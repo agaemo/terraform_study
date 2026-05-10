@@ -164,6 +164,52 @@ environments/
 
 ---
 
+## 8. リソースの保護と管理外への移行
+
+### 削除・変更を防ぐ（`lifecycle`）
+
+作成後に変更されたくないリソースには `lifecycle` ブロックで制約をかける。
+
+```hcl
+resource "aws_s3_bucket" "main" {
+  bucket = local.bucket_name
+
+  lifecycle {
+    prevent_destroy = true      # terraform destroy や削除を伴う変更をエラーにする
+    ignore_changes  = [tags]    # tags の変更を差分として検出しない
+  }
+}
+```
+
+| オプション | 効果 |
+|-----------|------|
+| `prevent_destroy` | `destroy` や再作成を伴う変更をエラーにして誤操作を防ぐ |
+| `ignore_changes` | 指定した属性が変わっても `plan` に差分を出さない |
+
+### Terraform の管理から完全に外す
+
+外部から作成済みのリソースや、今後 Terraform で変更したくないリソースは `data` ソースに切り替える。
+
+```bash
+# State からリソースを除外（リソース自体は削除されない）
+terraform state rm aws_s3_bucket.main
+```
+
+```hcl
+# resource を data に書き換える → 参照のみ、作成・変更・削除しない
+data "aws_s3_bucket" "main" {
+  bucket = "terraform-study-dev-main"
+}
+```
+
+| やりたいこと | 方法 |
+|------------|------|
+| 削除だけ防ぎたい | `lifecycle { prevent_destroy = true }` |
+| 一部の変更を無視したい | `lifecycle { ignore_changes = [...] }` |
+| 完全に管理をやめたい | `terraform state rm` → `data` に書き換え |
+
+---
+
 ## Kafka との対比
 
 | Kafka best_practices | Terraform best_practices |
