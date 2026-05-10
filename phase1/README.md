@@ -20,7 +20,7 @@ AWS も Docker も不要で、Terraform の基本操作（init/plan/apply/destro
 
 Terraform の **Write → Plan → Apply** ワークフローに沿って進める。
 
-### 準備
+### 1. 準備
 
 ```bash
 mise trust    # mise に .mise.toml を信頼させる（初回のみ）
@@ -28,7 +28,7 @@ mise install  # Terraform をインストール
 cd phase1/
 ```
 
-### Write — 設定ファイルを読む
+### 2. Write — 設定ファイルを読む
 
 このフェーズでは `.tf` ファイルがあらかじめ用意されている。
 各ファイルが何を定義しているかを確認してから次に進む。
@@ -52,7 +52,7 @@ cd phase1/
 
 → 各ファイルの詳細は「[各ファイルの役割](#各ファイルの役割)」を参照
 
-### Plan — 変更内容を確認する
+### 3. Plan — 変更内容を確認する
 
 ```bash
 terraform init  # プロバイダーをダウンロード（Plan の前準備）
@@ -61,7 +61,7 @@ terraform plan  # 作成されるリソースを確認（実際には何も変�
 
 `+` が表示されているリソースが新規作成される（`-` 削除・`~` 変更・`-/+` 再作成）。
 
-### Apply — リソースを作成する
+### 4. Apply — リソースを作成する
 
 ```bash
 terraform apply       # → "yes" と入力して確定
@@ -72,7 +72,7 @@ cat outputs/config.json
 cat terraform.tfstate   # State ファイルを確認（Terraform が追跡している状態）
 ```
 
-### Write → Plan → Apply を繰り返す
+### 5. Write → Plan → Apply を繰り返す
 
 `main.tf` の `content` を書き換えて、差分がどう表示されるかを体験する。
 
@@ -82,7 +82,7 @@ terraform plan   # ~ で変更差分が表示される
 terraform apply
 ```
 
-### Destroy — 後片付け
+### 6. Destroy — 後片付け
 
 ```bash
 terraform destroy
