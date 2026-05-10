@@ -60,7 +60,7 @@ terraform destroy  # 管理しているリソースをすべて削除
 実際には `main.tf` / `variables.tf` / `outputs.tf` に分かれているが、ここでは1つにまとめて表示する。
 
 ```hcl
-# ── versions.tf ─────────────────────────────────────────────────
+# ── main.tf ──────────────────────────────────────────────────────
 terraform {
   required_providers {
     aws = {                   # (A) "aws" という名前でプロバイダーを登録
@@ -71,20 +71,18 @@ terraform {
 }
 # terraform init がここを読んでプラグインをダウンロードする
 
-# ── providers.tf ─────────────────────────────────────────────────
 provider "aws" {              # (A) required_providers の "aws" と対応
   region = "ap-northeast-1"  #     リージョン・認証情報などを設定する
 }                             #     設定不要なプロバイダーはこのブロックごと省略可
+
+resource "aws_s3_bucket" "example" {   # "aws_" プレフィックスが (A) のプロバイダーに対応
+  bucket = var.bucket_name             # (B) → var.変数名 で参照
+}                                      # (C) このリソース全体を識別するラベル
 
 # ── variables.tf ─────────────────────────────────────────────────
 variable "bucket_name" {      # (B) 変数を定義
   default = "my-bucket"
 }
-
-# ── main.tf ──────────────────────────────────────────────────────
-resource "aws_s3_bucket" "example" {   # "aws_" プレフィックスが (A) のプロバイダーに対応
-  bucket = var.bucket_name             # (B) → var.変数名 で参照
-}                                      # (C) このリソース全体を識別するラベル
 
 # ── outputs.tf ───────────────────────────────────────────────────
 output "bucket_id" {
@@ -218,15 +216,16 @@ Terraform は **同じディレクトリにある `.tf` ファイルをすべて
 
 ```
 project/
-├── main.tf           # メインのリソース定義（resource ブロックなど）
-├── versions.tf       # terraform ブロック（required_providers, required_version）
-├── variables.tf      # 入力変数の定義（variable ブロック）       ※変数がなければ省略可
-├── outputs.tf        # 出力値の定義（output ブロック）            ※出力がなければ省略可
-├── providers.tf      # プロバイダー設定（provider ブロック）      ※設定がなければ省略可
+├── main.tf           # terraform{} / provider{} / resource{} / module{} をまとめて書く
+├── variables.tf      # 入力変数の定義（variable ブロック）※変数がなければ省略可
+├── outputs.tf        # 出力値の定義（output ブロック）    ※出力がなければ省略可
 └── terraform.tfvars  # 変数に渡す値（機密情報は .gitignore 対象）※variables.tf がある場合のみ
 ```
 
 これはあくまで**慣習**であり、Terraform 自体はファイル名を関知しない。
+
+> `versions.tf` や `providers.tf` に分割する構成も存在するが、大規模プロジェクトや公開モジュールで見られるスタイル。
+> 通常は `main.tf` にまとめて書けば十分。
 
 ### `main.tf` は変更できるか？
 
