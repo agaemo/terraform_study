@@ -79,6 +79,11 @@ resource "aws_s3_bucket" "example" {   # "aws_" プレフィックスが (A) の
   bucket = var.bucket_name             # (B) → var.変数名 で参照
 }                                      # (C) このリソース全体を識別するラベル
 
+module "network" {                     # (D) モジュールを呼び出す
+  source      = "./modules/network"    #     ローカルパスまたは Registry の URL を指定
+  bucket_name = var.bucket_name        # (B) → モジュールへ変数を渡す
+}                                      # (E) このモジュール全体を識別するラベル
+
 # ── variables.tf ─────────────────────────────────────────────────
 variable "bucket_name" {      # (B) 変数を定義
   default = "my-bucket"
@@ -88,13 +93,19 @@ variable "bucket_name" {      # (B) 変数を定義
 output "bucket_id" {
   value = aws_s3_bucket.example.id     # (C) → リソース種別.名前.属性 で参照
 }
+
+output "vpc_id" {
+  value = module.network.vpc_id        # (E) → module.モジュール名.出力名 で参照
+}
 ```
 
 | ラベル | 意味 |
 |--------|------|
 | **(A)** | `required_providers` のキー名と `provider "xxx"` のブロック名が一致することでリンクする |
-| **(B)** | `variable "x"` で定義した変数は `var.x` で参照する |
+| **(B)** | `variable "x"` で定義した変数は `var.x` で参照する。モジュールへの引数としても渡せる |
 | **(C)** | `resource "型" "名前"` は `型.名前.属性` という形で他のブロックから参照できる |
+| **(D)** | `module "名前"` でモジュールを呼び出す。`source` にローカルパスまたは Registry の URL を指定する |
+| **(E)** | モジュールの出力値は `module.モジュール名.出力名` で参照できる |
 
 ## 主要な概念
 
