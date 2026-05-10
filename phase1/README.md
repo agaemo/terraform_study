@@ -3,6 +3,11 @@
 `local` プロバイダーを使い、ローカルにファイルを作成する。
 AWS も Docker も不要で、Terraform の基本操作（init/plan/apply/destroy）を体験する。
 
+> **`local` プロバイダーとは**
+> AWS・GCP などのクラウドではなく、**自分の PC 上でファイルを作成・管理する**プロバイダー。
+> クラウドのアカウントや認証情報が不要なため、Terraform の操作そのものを手軽に学ぶのに適している。
+> phase2 以降でクラウドプロバイダーに切り替えても、init/plan/apply/destroy の流れは同じ。
+
 ## 学習目標
 
 1. `terraform init` でプロバイダーをダウンロードする
