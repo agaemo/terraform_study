@@ -25,6 +25,9 @@ Terraform の **Write → Plan → Apply** ワークフローに沿って進め�
 # リポジトリルートで LocalStack を起動（Docker が必要）
 docker compose up -d
 
+# 起動確認（compose.yml があるルートでのみ有効）
+docker compose ps
+
 cd phase2/
 ```
 
