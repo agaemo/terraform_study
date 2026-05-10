@@ -1,2 +1,3 @@
 [tools]
+awscli = "2.34.45"
 terraform = "1.9.8"
