@@ -54,6 +54,43 @@ terraform apply    # 実際にリソースを作成・変更
 terraform destroy  # 管理しているリソースをすべて削除
 ```
 
+## 概念の相関図
+
+各ブロックがどう連携して動くかを示す。
+
+```mermaid
+flowchart TB
+    subgraph TF["terraform {}"]
+        RP["required_providers\nsource / version"]
+    end
+
+    PROV["provider 'aws' {}\nregion・認証情報など\n※設定不要なら省略可"]
+    VAR["variable {}\n入力値の定義"]
+    RES["resource {}\n作るものの定義"]
+    OUT["output {}\n出力値の定義"]
+
+    INIT(["terraform init"])
+    PLUGIN[".terraform/\nProvider Plugin"]
+    INFRA[("実インフラ\nAWS / GCP など")]
+    STATE[("terraform.tfstate\nState ファイル")]
+
+    RP -->|"どれをDLするか指示"| INIT
+    INIT -->|"ダウンロード"| PLUGIN
+    PROV -->|"API の向き先・認証を設定"| PLUGIN
+    VAR -.->|"var.xxx で参照"| RES
+    PLUGIN -->|"API 呼び出し"| INFRA
+    RES -->|"terraform apply"| INFRA
+    INFRA -->|"結果を記録"| STATE
+    RES -.->|"リソース属性を参照"| OUT
+```
+
+**ポイント**
+
+- `terraform { required_providers }` はプロバイダーの「宣言」。`terraform init` がここを読んでプラグインをダウンロードする
+- `provider "aws" {}` はプロバイダーの「設定」。リージョンや認証情報を渡す。設定が不要なプロバイダー（`hashicorp/local` など）は省略できる
+- `resource` はリソース名のプレフィックス（`aws_s3_bucket` の `aws` 部分）で、どのプロバイダーを使うかが暗黙的に決まる
+- 実線 `→` は terraform コマンドによる実行フロー、点線 `-.->` は HCL 内の参照
+
 ## 主要な概念
 
 ### Provider
