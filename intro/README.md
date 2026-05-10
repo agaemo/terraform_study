@@ -87,8 +87,38 @@ resource "aws_s3_bucket" "example" {
 }
 ```
 
-- `aws_s3_bucket` → リソースタイプ（プロバイダーが定義）
-- `example` → このコード内でのリソース名（参照用）
+`resource` の後ろには文字列が2つ続く。それぞれ役割が異なる。
+
+```
+resource  "aws_s3_bucket"  "example"
+           ^^^^^^^^^^^^^^   ^^^^^^^
+           1つ目             2つ目
+```
+
+**1つ目：リソースタイプ**
+
+`プロバイダー名_リソースの種類` の形式。プロバイダーが定義するため、自分では命名できない。
+
+| 例 | プロバイダー | 種類 |
+|----|------------|------|
+| `aws_s3_bucket` | `aws` | S3 バケット |
+| `aws_instance` | `aws` | EC2 インスタンス |
+| `local_file` | `local` | ローカルファイル |
+
+**2つ目：ローカル名**
+
+この Terraform プロジェクト内でリソースを識別するための名前。自由に付けられる。
+他のブロックから参照するときに使う。
+
+```hcl
+# 同じタイプを複数作る場合、ローカル名で区別する
+resource "aws_s3_bucket" "main" { ... }
+resource "aws_s3_bucket" "logs" { ... }
+
+# → リソースタイプ.ローカル名.属性 で参照
+output "main_id" { value = aws_s3_bucket.main.id }
+output "logs_id" { value = aws_s3_bucket.logs.id }
+```
 
 ### State（状態ファイル）
 
