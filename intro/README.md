@@ -219,11 +219,11 @@ Terraform は **同じディレクトリにある `.tf` ファイルをすべて
 ```
 project/
 ├── main.tf           # メインのリソース定義（resource ブロックなど）
-├── variables.tf      # 入力変数の定義（variable ブロック）
-├── outputs.tf        # 出力値の定義（output ブロック）
-├── providers.tf      # プロバイダー設定（provider ブロック）
 ├── versions.tf       # terraform ブロック（required_providers, required_version）
-└── terraform.tfvars  # 変数に渡す値（機密情報は .gitignore 対象）
+├── variables.tf      # 入力変数の定義（variable ブロック）       ※変数がなければ省略可
+├── outputs.tf        # 出力値の定義（output ブロック）            ※出力がなければ省略可
+├── providers.tf      # プロバイダー設定（provider ブロック）      ※設定がなければ省略可
+└── terraform.tfvars  # 変数に渡す値（機密情報は .gitignore 対象）※variables.tf がある場合のみ
 ```
 
 これはあくまで**慣習**であり、Terraform 自体はファイル名を関知しない。
@@ -278,7 +278,7 @@ resource "aws_s3_bucket" "example" {
 }
 ```
 
-**variables.tf — 外から値を渡すための入口を定義する**
+**variables.tf — 外から値を渡すための入口を定義する** ※変数が不要なら省略可
 
 `variable` ブロックで入力変数を定義する。  
 `validation` で許可する値を制約することもできる。
@@ -303,7 +303,7 @@ variable "environment" {
 | `.tfvars` ファイルで渡す | `terraform apply -var-file="prod.tfvars"` |
 | 環境変数で渡す | `TF_VAR_environment=stg terraform apply` |
 
-**outputs.tf — apply 後に表示する値を定義する**
+**outputs.tf — apply 後に表示する値を定義する** ※出力が不要なら省略可
 
 `output` ブロックで `terraform apply` 完了後に端末に表示される値を定義する。  
 `terraform output` コマンドでいつでも再表示できる。  
