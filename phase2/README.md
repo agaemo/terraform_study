@@ -90,9 +90,21 @@ terraform plan -var="enable_versioning=true"
 ### 6. Destroy — 後片付け
 
 ```bash
+# Terraform リソースを削除
 terraform destroy
-# LocalStack のリソースなので料金は発生しないが、destroy の習慣をつけておく
+
+# リポジトリルートに戻って Docker を停止
+cd ..
+
+# コンテナ・ボリューム・イメージをまとめて削除
+docker compose down -v --rmi all
 ```
+
+| オプション | 効果 |
+|-----------|------|
+| `down` | コンテナを停止・削除 |
+| `-v` | ボリューム（`localstack_data`）を削除 |
+| `--rmi all` | compose で使用したイメージ（`localstack/localstack`）を削除 |
 
 ## ファイル構成
 
