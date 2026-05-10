@@ -56,40 +56,47 @@ terraform destroy  # 管理しているリソースをすべて削除
 
 ## 概念の相関図
 
-各ブロックがどう連携して動くかを示す。
+各ブロックがコード上でどう繋がっているかをラベルで示す。  
+実際には `main.tf` / `variables.tf` / `outputs.tf` に分かれているが、ここでは1つにまとめて表示する。
 
-```mermaid
-flowchart TB
-    subgraph TF["terraform {}"]
-        RP["required_providers\nsource / version"]
-    end
+```hcl
+# ── プロバイダーの宣言 ──────────────────────────────────────────
+terraform {
+  required_providers {
+    aws = {                   # (A) "aws" という名前でプロバイダーを登録
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+# terraform init がここを読んでプラグインをダウンロードする
 
-    PROV["provider 'aws' {}\nregion・認証情報など\n※設定不要なら省略可"]
-    VAR["variable {}\n入力値の定義"]
-    RES["resource {}\n作るものの定義"]
-    OUT["output {}\n出力値の定義"]
+# ── プロバイダーの設定 ──────────────────────────────────────────
+provider "aws" {              # (A) required_providers の "aws" と対応
+  region = "ap-northeast-1"  #     リージョン・認証情報などを設定する
+}                             #     設定不要なプロバイダーはこのブロックごと省略可
 
-    INIT(["terraform init"])
-    PLUGIN[".terraform/\nProvider Plugin"]
-    INFRA[("実インフラ\nAWS / GCP など")]
-    STATE[("terraform.tfstate\nState ファイル")]
+# ── 入力変数 ────────────────────────────────────────────────────
+variable "bucket_name" {      # (B) 変数を定義
+  default = "my-bucket"
+}
 
-    RP -->|"どれをDLするか指示"| INIT
-    INIT -->|"ダウンロード"| PLUGIN
-    PROV -->|"API の向き先・認証を設定"| PLUGIN
-    VAR -.->|"var.xxx で参照"| RES
-    PLUGIN -->|"API 呼び出し"| INFRA
-    RES -->|"terraform apply"| INFRA
-    INFRA -->|"結果を記録"| STATE
-    RES -.->|"リソース属性を参照"| OUT
+# ── リソース定義 ─────────────────────────────────────────────────
+resource "aws_s3_bucket" "example" {   # "aws_" プレフィックスが (A) のプロバイダーに対応
+  bucket = var.bucket_name             # (B) → var.変数名 で参照
+}                                      # (C) このリソース全体を識別するラベル
+
+# ── 出力値 ──────────────────────────────────────────────────────
+output "bucket_id" {
+  value = aws_s3_bucket.example.id     # (C) → リソース種別.名前.属性 で参照
+}
 ```
 
-**ポイント**
-
-- `terraform { required_providers }` はプロバイダーの「宣言」。`terraform init` がここを読んでプラグインをダウンロードする
-- `provider "aws" {}` はプロバイダーの「設定」。リージョンや認証情報を渡す。設定が不要なプロバイダー（`hashicorp/local` など）は省略できる
-- `resource` はリソース名のプレフィックス（`aws_s3_bucket` の `aws` 部分）で、どのプロバイダーを使うかが暗黙的に決まる
-- 実線 `→` は terraform コマンドによる実行フロー、点線 `-.->` は HCL 内の参照
+| ラベル | 意味 |
+|--------|------|
+| **(A)** | `required_providers` のキー名と `provider "xxx"` のブロック名が一致することでリンクする |
+| **(B)** | `variable "x"` で定義した変数は `var.x` で参照する |
+| **(C)** | `resource "型" "名前"` は `型.名前.属性` という形で他のブロックから参照できる |
 
 ## 主要な概念
 
